@@ -2,3 +2,5 @@
 Data analysis of yelp dataset
 
 About Yelp dateset, you could download from https://www.yelp.com/dataset
+
+Created by Kevin, Vamsi, Geng, Josvin
