@@ -19,9 +19,9 @@ def main():
     print("Count of Negative Views: ", cntNegReviews)
     print("Count of Positive Views: ", cntPosReviews)
 
-    negPhrases = wordmap(yelp_reviews, negativeReviews)
+    wordmap(yelp_reviews, negativeReviews)
 
-    createMap(negPhrases, "neg")
+    # createMap(negPhrases, "neg")
 
 
 def getReviewType(userReview):
@@ -53,26 +53,31 @@ def wordmap(yelp_review, reviewDF):
                          columns=['business_id', "Business name", "categories"])
 
     businessData = pd.merge(businesses, right=right, how="inner", on='business_id')
-    numBusAnal = 1
+
+    # businessData[businessData['categories'] = ]
+
+    numBusAnal = 4
 
     bIDs = businessData.sort_values("rated")[::-1][:numBusAnal].business_id.values
 
-    returnVal = []
+    businessNames = businessData.sort_values("rated")[::-1][:numBusAnal]["Business name"].values
+
+    # returnVal = []
+    f = open('temp.csv', 'w')
 
     for i, business_id in enumerate(bIDs):
         # now extract reviews from reviews data
+        print("Business Name: ", businessNames[i])
         reviews = yelp_review.loc[yelp_review['business_id'] == business_id].text.values
         most_used_text = rh.count_ngrams(reviews, max_length=2)
 
-        for i in sorted(most_used_text):
-            for gram, count in most_used_text[i].most_common(50):
-                returnVal.append('{0}: {1}'.format(' '.join(gram), count))
-
-    return returnVal
+        for j in sorted(most_used_text):
+            for gram, count in most_used_text[j].most_common(50):
+                f.write('{0}: {1}\n'.format(' '.join(gram), count))
 
 
 def createMap(values, type):
-    stdin = values.tobytes() # Error: 'list' object has no attribute 'tobytes'. Need to fix the return of wordmap()
+    stdin = bytes(values)  # Error: 'list' object has no attribute 'tobytes'. Need to fix the return of wordmap()
 
     job = mapping.ReviewCount()
     job.sandbox(stdin=stdin)
