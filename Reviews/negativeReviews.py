@@ -6,13 +6,12 @@ from Reviews import mapping
 
 
 def main():
-    # businesses = pd.read_csv("../Yelp Data Files/CSV Files/business.csv")
-    reviews = pd.read_csv("../Yelp Data Files/CSV Files/review.csv")
+    yelp_reviews = pd.read_csv("../Yelp Data Files/CSV Files/review.csv")
     # users = pd.read_csv("../Yelp Data Files/CSV Files/user.csv")
     # photos = pd.read_csv("../Yelp Data Files/CSV Files/photo.csv")
 
-    negativeReviews = reviews[reviews["stars"] < 2]
-    positiveReviews = reviews[reviews["stars"] > 3]
+    negativeReviews = yelp_reviews[yelp_reviews["stars"] < 2]
+    positiveReviews = yelp_reviews[yelp_reviews["stars"] > 3]
 
     cntNegReviews = len(negativeReviews)
     cntPosReviews = len(positiveReviews)
@@ -20,7 +19,7 @@ def main():
     print("Count of Negative Views: ", cntNegReviews)
     print("Count of Positive Views: ", cntPosReviews)
 
-    negPhrases = wordmap(negativeReviews)
+    negPhrases = wordmap(yelp_reviews, negativeReviews)
 
     createMap(negPhrases, "neg")
 
@@ -33,7 +32,7 @@ def promptUser():
     userReview = input("Please enter a review: ")
 
 
-def wordmap(reviewDF):
+def wordmap(yelp_review, reviewDF):
     reviews_dict = {}
 
     for bID in reviewDF["business_id"].values:
@@ -47,7 +46,28 @@ def wordmap(reviewDF):
     businesses.reset_index(inplace=True)
     businesses.columns = ['business_id', 'rated']
 
-    return []
+    yelp_businesses = pd.read_csv("../Yelp Data Files/CSV Files/business.csv")
+
+    top_count = 20
+    right = pd.DataFrame(yelp_businesses[['business_id', "name", "categories"]].values,
+                         columns=['business_id', "Business name", "categories"])
+
+    businessData = pd.merge(businesses, right=right, how="inner", on='business_id')
+    numBusAnal = 1
+
+    bIDs = businessData.sort_values("rated")[::-1][:numBusAnal].business_id.values
+
+    returnVal = []
+
+    for i, business_id in enumerate(bIDs):
+        # now extract reviews from reviews data
+        reviews = yelp_review.loc[yelp_review['business_id'] == business_id].text.values
+        most_used_text = rh.count_ngrams(reviews, max_length=2)
+
+        returnVal.append(most_used_text)
+
+    return returnVal
+
 
 def createMap(values, type):
     stdin = values.tobytes()
@@ -67,3 +87,7 @@ def createMap(values, type):
 
         s = "%s,%d\n" % (key, value)
         f.write(s)
+
+
+if __name__ == "__main__":
+    main()
