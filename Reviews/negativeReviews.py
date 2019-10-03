@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 
 import Reviews.reviewHelpers as rh
+from Reviews import mapping
+
 
 def main():
     # businesses = pd.read_csv("../Yelp Data Files/CSV Files/business.csv")
@@ -18,7 +20,9 @@ def main():
     print("Count of Negative Views: ", cntNegReviews)
     print("Count of Positive Views: ", cntPosReviews)
 
-    wordmap(negativeReviews)
+    negPhrases = wordmap(negativeReviews)
+
+    createMap(negPhrases, "neg")
 
 
 def getReviewType(userReview):
@@ -43,8 +47,23 @@ def wordmap(reviewDF):
     businesses.reset_index(inplace=True)
     businesses.columns = ['business_id', 'rated']
 
-    print(businesses.head(15))
+    return []
 
-    businesses = businesses[businesses['rated'] > 200]
+def createMap(values, type):
+    stdin = values.tobytes()
 
-    print(businesses.head(15))
+    job = mapping.ReviewCount()
+    job.sandbox(stdin=stdin)
+
+    runner = job.make_runner()
+
+    runner.run()
+
+    f = open(type + "_reviews.csv", "w")
+
+    for line in runner.stream_output():
+        # Use the job's specified protocol to read an output key-value pair
+        key, value = job.parse_output_line(line)
+
+        s = "%s,%d\n" % (key, value)
+        f.write(s)
