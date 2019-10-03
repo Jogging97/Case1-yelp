@@ -19,4 +19,4 @@ ckin1 = ckin.sort_values('count',ascending=False)
 f = ckin1[['business_id', 'count']]
 r = pd.merge(f, bus, on='business_id')
 a = r.iloc[:10]
-print a.to_string(index=False)
+print (a.to_string(index=False))
