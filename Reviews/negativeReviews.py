@@ -64,7 +64,9 @@ def wordmap(yelp_review, reviewDF):
         reviews = yelp_review.loc[yelp_review['business_id'] == business_id].text.values
         most_used_text = rh.count_ngrams(reviews, max_length=2)
 
-        returnVal.append(most_used_text)
+        for i in sorted(most_used_text):
+            for gram, count in most_used_text[i].most_common(50):
+                returnVal.append(gram + ": " + count)
 
     return returnVal
 
