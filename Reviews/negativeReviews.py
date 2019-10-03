@@ -1,3 +1,5 @@
+from io import BytesIO
+
 import numpy as np
 import pandas as pd
 
@@ -19,17 +21,10 @@ def main():
     print("Count of Negative Views: ", cntNegReviews)
     print("Count of Positive Views: ", cntPosReviews)
 
-    wordmap(yelp_reviews, negativeReviews)
+    wordmap(yelp_reviews, positiveReviews)
 
-    # createMap(negPhrases, "neg")
-
-
-def getReviewType(userReview):
-    print("Hi")
-
-
-def promptUser():
-    userReview = input("Please enter a review: ")
+    # createMap("neg")  # First run
+    createMap("pos")  # Second Run
 
 
 def wordmap(yelp_review, reviewDF):
@@ -56,7 +51,7 @@ def wordmap(yelp_review, reviewDF):
 
     # businessData[businessData['categories'] = ]
 
-    numBusAnal = 4
+    numBusAnal = 10
 
     bIDs = businessData.sort_values("rated")[::-1][:numBusAnal].business_id.values
 
@@ -76,8 +71,13 @@ def wordmap(yelp_review, reviewDF):
                 f.write('{0}: {1}\n'.format(' '.join(gram), count))
 
 
-def createMap(values, type):
-    stdin = bytes(values)  # Error: 'list' object has no attribute 'tobytes'. Need to fix the return of wordmap()
+def createMap(type):
+
+    values = open('temp.csv', 'rb')
+
+    stdin = BytesIO(values.read())
+
+   # stdin = bytes(values)  # Error: 'list' object has no attribute 'tobytes'. Need to fix the return of wordmap()
 
     job = mapping.ReviewCount()
     job.sandbox(stdin=stdin)
