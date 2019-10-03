@@ -66,7 +66,7 @@ def wordmap(yelp_review, reviewDF):
 
         for i in sorted(most_used_text):
             for gram, count in most_used_text[i].most_common(50):
-                returnVal.append(gram + ": " + count)
+                returnVal.append('{0}: {1}'.format(' '.join(gram), count))
 
     return returnVal
 
