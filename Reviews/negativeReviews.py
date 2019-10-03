@@ -72,7 +72,7 @@ def wordmap(yelp_review, reviewDF):
 
 
 def createMap(values, type):
-    stdin = values.tobytes()
+    stdin = values.tobytes() # Error: 'list' object has no attribute 'tobytes'. Need to fix the return of wordmap()
 
     job = mapping.ReviewCount()
     job.sandbox(stdin=stdin)
